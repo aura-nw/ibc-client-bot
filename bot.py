@@ -81,17 +81,18 @@ def start(update: Update, context: CallbackContext) -> None:
 
 @log_request
 def status(update: Update, context: CallbackContext) -> None:
-    response_message = ""
     for client, url in CLIENT_LIST:
         _, _, _, chain_id = get_revision_info(url, client)
         time_left = calculate_time_left(url, client)
         days, hours, minutes = days_hours_minutes(time_left)
         if isinstance(time_left, timedelta):
-            response_message += f"- Source: {url}, Client: *{client}*, Counterparty: *{chain_id}*, Time left until expiration: *{days}* days + *{hours}* hours + *{minutes}* minutes.\n"
+            response_message = f"- Source: {url}, Client: *{client}*, Counterparty: *{chain_id}*, Time left: *{days}*days - *{hours}*hours - *{minutes}*minutes.\n"
+            context.bot.send_message(chat_id=CHANNEL_ID, text=response_message, parse_mode="Markdown", reply_to_message_id=update.message.message_id)
         else:
-            response_message += f"Client: {client}, {time_left}\n"
-
-    update.message.reply_markdown(response_message)
+            response_message = f"Client: {client}, {time_left}\n"
+            context.bot.send_message(chat_id=CHANNEL_ID, text=response_message, parse_mode="Markdown")
+            
+    # update.message.reply_markdown(response_message)
 
 @log_request
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -110,9 +111,8 @@ def alert(context: CallbackContext) -> None:
         time_left = calculate_time_left(url, client)
         
         if isinstance(time_left, timedelta) and time_left < timedelta(days=2):
-            alert_message = f"- Alert! Client: {client}, Chain ID: {chain_id}, will be expired after {time_left}"
-            context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message)
-
+            alert_message = f"- *ALERT*! Client: {client}, Counterparty: {chain_id}, will be expired after {time_left}"
+            context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message, parse_mode="Markdown")
 
 def main():
     updater = Updater(BOT_TOKEN, use_context=True)
