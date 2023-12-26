@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibc-telegram-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ibc-telegram-bot
+  template:
+    metadata:
+      labels:
+        app: ibc-telegram-bot
+    spec:
+      containers:
+      - name: ibc-telegram-bot
+        image: your-docker-image:tag
+        env:
+        - name: BOT_TOKEN
+          value: your_token
+        - name: CLIENT_LIST
+          value: your_client_list
+        - name: CHANNEL_ID
+          value: your_telegram_channel_id
+        - name: POLL_INTERVAL
+          value: "5.0"  # default poll interval in seconds
