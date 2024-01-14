@@ -89,8 +89,7 @@ def status(update: Update, context: CallbackContext) -> None:
             response_message = f"- Source: {url}, Client: *{client}*, Counterparty: *{chain_id}*, Time left: *{days}*days - *{hours}*hours - *{minutes}*minutes.\n"
             context.bot.send_message(chat_id=CHANNEL_ID, text=response_message, parse_mode="Markdown", reply_to_message_id=update.message.message_id)
         else:
-            response_message = f"Client: {client}, {time_left}\n"
-            context.bot.send_message(chat_id=CHANNEL_ID, text=response_message, parse_mode="Markdown")
+            context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!", parse_mode="Markdown")
             
     # update.message.reply_markdown(response_message)
 
@@ -110,10 +109,12 @@ def alert(context: CallbackContext) -> None:
         _, _, _, chain_id = get_revision_info(url, client)
         time_left = calculate_time_left(url, client)
 
-        context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.", parse_mode="Markdown")
         if isinstance(time_left, timedelta) and time_left < timedelta(days=2):
             alert_message = f"- *ALERT*! Client: {client}, Counterparty: {chain_id}, will be expired after {time_left}"
             context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message, parse_mode="Markdown")
+        elif not isinstance(time_left, timedelta):
+            context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!", parse_mode="Markdown")
+    context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.(Run once per day)", parse_mode="Markdown")
 
 def main():
     updater = Updater(BOT_TOKEN, use_context=True)
@@ -125,8 +126,8 @@ def main():
 
     updater.start_polling(poll_interval=POLL_INTERVAL)
 
-     # Run the alert function every 12 hours
-    updater.job_queue.run_repeating(alert, interval=43200, first=0, context=None)
+     # Run the alert function once per day
+    updater.job_queue.run_repeating(alert, interval=86400.0, first=20.0, context=None)
 
     updater.idle()
 
