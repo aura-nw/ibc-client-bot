@@ -109,7 +109,8 @@ def alert(context: CallbackContext) -> None:
     for client, url in CLIENT_LIST:
         _, _, _, chain_id = get_revision_info(url, client)
         time_left = calculate_time_left(url, client)
-        
+
+        context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.", parse_mode="Markdown")
         if isinstance(time_left, timedelta) and time_left < timedelta(days=2):
             alert_message = f"- *ALERT*! Client: {client}, Counterparty: {chain_id}, will be expired after {time_left}"
             context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message, parse_mode="Markdown")
