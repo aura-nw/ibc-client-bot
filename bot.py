@@ -105,16 +105,19 @@ def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(help_text)
 
 def alert(context: CallbackContext) -> None:
-    for client, url in CLIENT_LIST:
-        _, _, _, chain_id = get_revision_info(url, client)
-        time_left = calculate_time_left(url, client)
-
-        if isinstance(time_left, timedelta) and time_left < timedelta(days=2):
-            alert_message = f"- *ALERT*! Client: {client}, Counterparty: {chain_id}, will be expired after {time_left}"
-            context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message, parse_mode="Markdown")
-        elif not isinstance(time_left, timedelta):
-            context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!", parse_mode="Markdown")
-    context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.(Run once per day)", parse_mode="Markdown")
+    try:
+        for client, url in CLIENT_LIST:
+            _, _, _, chain_id = get_revision_info(url, client)
+            time_left = calculate_time_left(url, client)
+    
+            if isinstance(time_left, timedelta) and time_left < timedelta(days=2):
+                alert_message = f"- *ALERT*! Client: {client}, Counterparty: {chain_id}, will be expired after {time_left}"
+                context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message, parse_mode="Markdown")
+            elif not isinstance(time_left, timedelta):
+                context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!", parse_mode="Markdown")
+        context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.(Run once per day)", parse_mode="Markdown")
+    except Exception as e:
+        context.bot.send_message(chat_id=CHANNEL_ID, text=e, parse_mode="Markdown")
 
 def main():
     updater = Updater(BOT_TOKEN, use_context=True)
