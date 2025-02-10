@@ -87,9 +87,9 @@ def status(update: Update, context: CallbackContext) -> None:
         days, hours, minutes = days_hours_minutes(time_left)
         if isinstance(time_left, timedelta):
             response_message = f"- Source: {url}, Client: *{client}*, Counterparty: *{chain_id}*, Time left: *{days}*days - *{hours}*hours - *{minutes}*minutes.\n"
-            context.bot.send_message(chat_id=CHANNEL_ID, text=response_message, parse_mode="Markdown", reply_to_message_id=update.message.message_id)
+            context.bot.send_message(chat_id=CHANNEL_ID, text=response_message, reply_to_message_id=update.message.message_id)
         else:
-            context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!", parse_mode="Markdown")
+            context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!")
             
     # update.message.reply_markdown(response_message)
 
@@ -112,12 +112,12 @@ def alert(context: CallbackContext) -> None:
     
             if isinstance(time_left, timedelta) and time_left < timedelta(days=2):
                 alert_message = f"- *ALERT*! Client: {client}, Counterparty: {chain_id}, will be expired after {time_left}"
-                context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message, parse_mode="Markdown")
+                context.bot.send_message(chat_id=CHANNEL_ID, text=alert_message)
             elif not isinstance(time_left, timedelta):
-                context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!", parse_mode="Markdown")
-        context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.(Run once per day)", parse_mode="Markdown")
+                context.bot.send_message(chat_id=CHANNEL_ID, text="Error when checking ibc client !!!")
+        context.bot.send_message(chat_id=CHANNEL_ID, text="Watchdog! Client alert is working normally.(Run once per day)")
     except Exception as e:
-        context.bot.send_message(chat_id=CHANNEL_ID, text=e, parse_mode="Markdown")
+        context.bot.send_message(chat_id=CHANNEL_ID, text=e)
 
 def main():
     updater = Updater(BOT_TOKEN, use_context=True)
